@@ -4,6 +4,14 @@ Supervised fine-tuning pipeline for training a **user language model** (a model 
 
 Training is driven by a lightly customized fork of [`llama-cookbook`](https://github.com/meta-llama/llama-cookbook) (in [llama-cookbook/](llama-cookbook/)) that adds a `userlm_dataset` and a `<|endconversation|>` special token (token embedding initialized from the EOS token of base LLM vocabulary), plus FSDP + torch.compile implementation. For more details, please refer to the Appendix of our paper.
 
+## Checkpoints
+
+We release the trained checkpoints on HuggingFace:
+- SFTUser from Qwen/Qwen2.5-14B-Instruct: https://huggingface.co/jjssuh/sftuser-base-Qwen2.5-14B-Instruct
+- SFTUser from Qwen/Qwen2.5-7B-Instruct: https://huggingface.co/jjssuh/sftuser-base-Qwen2.5-7B-Instruct
+- SFTUser from Qwen/Qwen2.5-32B-Instruct: https://huggingface.co/jjssuh/sftuser-base-Qwen2.5-32B-Instruct
+- SFTUser2 (trained on WildChat-4.8M) from Qwen/Qwen2.5-14B-Instruct: https://huggingface.co/jjssuh/sftuser2-base-Qwen2.5-14B-Instruct
+
 ## Pipeline
 
 | Step | Script | Input → Output |
