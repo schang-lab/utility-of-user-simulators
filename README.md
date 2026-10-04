@@ -1,5 +1,13 @@
 # Quantifying the Utility of User Simulators for Building Collaborative LLM Assistants
 
+<!--- BADGES: START --->
+[![Arxiv](https://img.shields.io/badge/arXiv-2605.09808-B31B1B.svg)][#arxiv-paper-package]
+[![Github License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)][#license-gh-package]
+
+[#license-gh-package]: LICENSE
+[#arxiv-paper-package]: https://arxiv.org/abs/2605.09808
+<!--- BADGES: END --->
+
 User simulators are widely used to train interactive LLM assistants, but it is unclear how to measure whether a simulator is any good. We propose to measure a simulator by its **downstream utility**: how well an assistant trained against it performs with real people.
 
 We train the same initial assistant with multi-turn reinforcement learning against a range of user simulators:
@@ -9,6 +17,8 @@ We train the same initial assistant with multi-turn reinforcement learning again
 Only the simulator varies between runs. We then evaluate the trained assistants in three ways: a user study with 283 participants, WildBench, and cross-simulator evaluation. In the user study, the SFTUser-trained assistant has a 58% win rate against the initial assistant and 57% against the RPUser1-trained assistant. The RPUser1-trained assistant is statistically indistinguishable from the initial one (51%).
 
 This repository contains the code for every stage of that pipeline.
+
+![Paper figure](assets/figure_prelim_final.png)
 
 ## Repository layout
 
@@ -51,3 +61,20 @@ The code in this repository is released under the [BSD 3-Clause License](LICENSE
 - [`rl_training/SkyRL/`](rl_training/SkyRL/README.md): trimmed and modified copy of [SkyRL](https://github.com/NovaSky-AI/SkyRL), Apache License 2.0; modifications are listed in its README.
 
 Datasets and model weights used or released here are subject to their own licenses and terms of use.
+
+---
+
+## Contact
+
+For questions or issues about the paper and implementation, please open an issue or contact josephsuh@berkeley.edu.
+
+## Citation
+
+```
+@article{suh2026quantifying,
+  title={Quantifying the Utility of User Simulators for Building Collaborative LLM Assistants},
+  author={Suh, Joseph and Raj, Ayush and Kang, Minwoo and Chang, Serina},
+  journal={arXiv preprint arXiv:2605.09808},
+  year={2026}
+}
+```
