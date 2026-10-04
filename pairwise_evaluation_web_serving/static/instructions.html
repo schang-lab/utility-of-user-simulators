@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Instructions — UC Berkeley</title>
+<link rel="stylesheet" href="/study.css">
+</head>
+<body class="study-page">
+
+<header class="study-header">
+  <span class="header-logo">UC Berkeley</span>
+  <span class="header-title">Creating Writing Contents with AI Assistants</span>
+  <span class="header-badge">IRB Study</span>
+</header>
+
+<div class="study-content">
+
+  <div class="study-card">
+    <h2>Task Instructions</h2>
+    <p>
+      Thank you for participating in this study!
+      Please read the instructions below carefully before beginning.
+    </p>
+  </div>
+
+  <div class="study-card">
+    <span class="task-badge">Pairwise Writing Task</span>
+    <h2>Creating a document with two AI assistants (side-by-side)</h2>
+    <p>
+      In this task, you will collaborate with <strong>two AI assistants</strong> at the same time on a short
+      document, comparing their responses side-by-side. The task is broken into four sequential steps:
+      a writing-topic setup, a brief <strong>training session</strong> so you can get familiar with the
+      interface, and then the <strong>real session</strong> on the same topic.
+    </p>
+    <ol style="margin-left: 22px; line-height: 1.7;">
+      <li>
+        <strong>Step 1 — Choose a writing topic.</strong>
+        You will be assigned a document type (blog post, creative writing, or personal statement)
+        and choose an intent (the topic you want to write about) from a list of possible writing topics.
+      </li>
+      <li>
+        <strong>Step 2 — Pre-writing.</strong>
+        Before talking to the AIs, you will briefly jot down your thoughts on a few
+        preparation questions. These notes are just for you — the AIs do not see them.
+      </li>
+      <li>
+        <strong>Step 3 — Training session (1 exchange).</strong>
+        Before the real session begins, you'll do a short <strong>1-exchange warm-up</strong>
+        with the side-by-side interface so the format is familiar. You'll send one message,
+        compare the two replies, and pick a preference with a brief rationale.
+        After you submit your preference, the page will refresh automatically.
+      </li>
+      <li>
+        <strong>Step 4 — Real session (minimum 5 exchanges).</strong>
+        On the same writing topic, you'll have a <strong>minimum 5-exchange conversation</strong>
+        with the two AI assistants. At each exchange you will see replies from two different AI
+        models side-by-side (labeled <strong>"Model A"</strong> and <strong>"Model B"</strong>).
+        After each pair of replies, you pick the one you prefer and briefly say why — both AIs
+        then pick up from that chosen reply for the next message.
+      </li>
+    </ol>
+
+    <div class="alert alert-info" style="margin-top: 12px;">
+      <strong>Requirements:</strong>
+      <ul style="margin-top: 8px; margin-bottom: 0;">
+        <li>The training session is <strong>1 exchange</strong>; the real session is <strong>minimum 5 exchanges</strong>.</li>
+        <li>After <strong>every exchange</strong>, you'll pick "A is better" / "Tie" / "B is better" with a brief one-sentence rationale.</li>
+        <li>The final document (from the real session) should be at least <strong>200 words</strong>.</li>
+        <li>The page will refresh automatically between training and the real session — please do not close the tab.</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Important — the AIs do not know your intent in advance.</strong>
+      Both AI assistants start blind: they don't see your document type, your chosen intent,
+      or your pre-writing notes. You must tell them what you want to write through your own
+      messages. Your pre-writing notes are on your screen as a reference for you — they are
+      not sent to the AIs.
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Tips:</strong>
+      <ul style="margin-top: 8px; margin-bottom: 0;">
+        <li>Open the conversation by telling the AIs, in your own words, what you want to write.</li>
+        <li>Make a genuine effort to engage with the AIs thoughtfully.</li>
+        <li>Please do <strong>not</strong> paste all your pre-writing notes at once — please use your own words.</li>
+        <li>Don't worry if the discussion takes a different direction than what you initially planned in notes.</li>
+        <li>Note that the AI model may take a few seconds to return a response — don't worry, this is normal.</li>
+        <li>If you see content that seems inappropriate, use the "Report" button on the assistant's response.</li>
+      </ul>
+    </div>
+
+    <p class="text-muted text-small" style="margin-top: 10px;">
+      A detailed guide for what to look for when comparing replies will be shown at the top of the task page —
+      you don't need to memorize it now.
+    </p>
+  </div>
+
+  <div class="study-card text-center">
+    <p class="text-muted mb-16">When you are ready, click the button below to continue.</p>
+    <div class="btn-actions center">
+      <button class="btn-primary" onclick="continueToPage2()">Continue →</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(async function init() {
+  try {
+    const res = await fetch('/api/study/status');
+    if (!res.ok) return;
+    const data = await res.json();
+
+    if (!data.has_session || !data.consent_given) {
+      window.location.href = '/study';
+      return;
+    }
+    if (data.completed) {
+      window.location.href = '/study/done';
+      return;
+    }
+  } catch (_) {}
+})();
+
+function continueToPage2() {
+  window.location.href = '/study/instructions2';
+}
+</script>
+</body>
+</html>

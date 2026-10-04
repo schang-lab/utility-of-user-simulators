@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Important Information — UC Berkeley</title>
+<link rel="stylesheet" href="/study.css">
+</head>
+<body class="study-page">
+
+<header class="study-header">
+  <span class="header-logo">UC Berkeley</span>
+  <span class="header-title">Creating Writing Contents with AI Assistants</span>
+  <span class="header-badge">IRB Study</span>
+</header>
+
+<div class="study-content">
+
+  <div class="study-card">
+    <h2>Important Information</h2>
+    <p>
+      Before you begin, please read these guidelines carefully. They apply throughout the study.
+    </p>
+    <div class="alert alert-warning">
+      <strong>Important:</strong> Please do not enter any personally identifiable or sensitive information
+      (such as your name, address, or health details) in your messages at any point during this study.
+    </div>
+    <div class="alert alert-warning">
+      <strong>Please complete the task on your own.</strong>
+      Do not use outside sources such as Google, Wikipedia, or other AI tools
+      (like ChatGPT, Claude, or Gemini) to help with your writing or messages.
+      We want to understand how you collaborate with the AI in this study directly.
+    </div>
+    <div class="alert alert-warning">
+      <strong>Please complete in a single uninterrupted run.</strong>
+      To ensure your responses are properly recorded and to accurately track the time and effort you spend on the task,
+      do not refresh the page, go to the previous page, close the browser tab, or take a long break.
+    </div>
+  </div>
+
+  <div class="study-card">
+    <h2>Quality Check</h2>
+    <p>
+      We review all submissions for quality before approving compensation. To help us get the most out of this study —
+      and to make sure your submission is approved — please keep the following in mind:
+    </p>
+    <ul style="margin-left: 22px; line-height: 1.7;">
+      <li>
+        <strong>Time:</strong> Your activity timestamps are recorded. Submissions that finish unusually quickly or
+        include long gaps will be reviewed.
+      </li>
+      <li>
+        <strong>Message quality:</strong> Messages that are very short, off-topic, or appear copied from external sources
+        will be flagged. Please engage genuinely with the writing task in your own words.
+      </li>
+      <li>
+        <strong>Preference rationales:</strong> Generic rationales like "this one is better" will be flagged.
+        Please mention something specific about why you preferred one response over the other.
+      </li>
+      <li>
+        <strong>External tools:</strong> Using outside sources (Google, Wikipedia, other AI tools) is not permitted
+        and will be flagged.
+      </li>
+    </ul>
+  </div>
+
+  <div class="study-card">
+    <h2>Before You Begin</h2>
+    <p>Please confirm the following commitments. All three must be checked to begin the task.</p>
+    <div class="commitment-checklist" style="margin-top: 12px; padding: 14px 16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
+      <label style="display:flex; align-items:flex-start; gap:8px; font-size:14px; color:#334155; margin-bottom:10px; cursor:pointer;">
+        <input type="checkbox" class="commit-check" id="commit-1" style="margin-top:3px; flex-shrink:0;">
+        <span>I will engage genuinely with the writing task &mdash; my messages will be in my own words and relevant to the document I'm writing.</span>
+      </label>
+      <label style="display:flex; align-items:flex-start; gap:8px; font-size:14px; color:#334155; margin-bottom:10px; cursor:pointer;">
+        <input type="checkbox" class="commit-check" id="commit-2" style="margin-top:3px; flex-shrink:0;">
+        <span>I will write specific preference rationales that mention something concrete about the responses I'm comparing.</span>
+      </label>
+      <label style="display:flex; align-items:flex-start; gap:8px; font-size:14px; color:#334155; cursor:pointer;">
+        <input type="checkbox" class="commit-check" id="commit-3" style="margin-top:3px; flex-shrink:0;">
+        <span>I will not use external tools (Google, Wikipedia, or other AI assistants) during this study.</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="study-card text-center">
+    <p class="text-muted mb-16">When you are ready, click the button below to begin.</p>
+    <div class="btn-actions center">
+      <button class="btn-primary" id="begin-btn" disabled onclick="beginTask()">Begin Task →</button>
+    </div>
+    <p class="text-muted text-small mt-8">
+      The "Begin Task" button will become enabled once all three boxes above are checked.
+    </p>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(async function init() {
+  try {
+    const res = await fetch('/api/study/status');
+    if (!res.ok) return;
+    const data = await res.json();
+
+    if (!data.has_session || !data.consent_given) {
+      window.location.href = '/study';
+      return;
+    }
+    if (data.completed) {
+      window.location.href = '/study/done';
+      return;
+    }
+  } catch (_) {}
+})();
+
+const beginBtn = document.getElementById('begin-btn');
+const commitChecks = Array.from(document.querySelectorAll('.commit-check'));
+
+function allCommitmentsChecked() {
+  return commitChecks.every((cb) => cb.checked);
+}
+
+function updateBeginButtonState() {
+  beginBtn.disabled = !allCommitmentsChecked();
+}
+
+commitChecks.forEach((cb) => cb.addEventListener('change', updateBeginButtonState));
+
+function beginTask() {
+  if (!allCommitmentsChecked()) return;
+  window.location.href = '/study/setup';
+}
+</script>
+</body>
+</html>

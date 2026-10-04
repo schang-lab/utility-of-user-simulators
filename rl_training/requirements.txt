@@ -1,0 +1,3 @@
+# For prepare_data.py (training dependencies are managed by uv in SkyRL/skyrl-train).
+pandas
+pyarrow

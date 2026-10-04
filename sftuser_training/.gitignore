@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Pipeline outputs
+processed_data*/
+data_with_intents*/
+training_data*/
+tokenizers_and_configs--*/
+userlm_checkpoints*/
+*_dist_checkpoints/
+profiler_results/
+*.jsonl
+stats.json
+
+# Training / experiment logs
+wandb/
+*.log
+
+# Model / tokenizer weights
+*.safetensors
+*.bin
+*.pt
+*.pth
+
+# Secrets
+.env
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

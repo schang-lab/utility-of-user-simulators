@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Complete — UC Berkeley</title>
+<link rel="stylesheet" href="/study.css">
+</head>
+<body class="study-page">
+
+<!--
+  TEMPLATE NOTE: replace every bracketed placeholder ([PI name], [contact email],
+  [IRB protocol ID], ...) with your own study's details before deploying.
+-->
+
+<!-- Header -->
+<header class="study-header">
+  <span class="header-logo">UC Berkeley</span>
+  <span class="header-title">Human Evaluation of Language Model Responses</span>
+  <span class="header-badge">Study Complete</span>
+</header>
+
+<div class="study-content" style="display:flex; align-items:center; justify-content:center; min-height: calc(100vh - 60px);">
+  <div style="width: 100%; max-width: 600px;">
+
+    <div class="study-card text-center">
+      <div style="font-size: 56px; margin-bottom: 12px;">🎉</div>
+      <h2 style="text-align:center; border-bottom: none; padding-bottom: 0; margin-bottom: 12px;">
+        Thank You!
+      </h2>
+      <p style="font-size: 17px; color: #374151;">
+        You have successfully completed the study.
+      </p>
+
+      <div class="section-divider"></div>
+
+      <p style="font-size: 15px; font-weight: 600; color: var(--berkeley-blue);">
+        Your completion code:
+      </p>
+
+      <div class="completion-code-box" id="completion-code" onclick="copyCode()">
+        <!-- code inserted by JS -->
+      </div>
+
+      <p class="text-muted text-small" id="copy-hint">Click the code to copy it to your clipboard.</p>
+
+      <div id="prolific-return" style="margin-top: 18px; display: none;">
+        <a id="prolific-return-link" href="#" class="btn-primary"
+           style="display: inline-block; padding: 12px 28px; font-size: 16px; font-weight: 700; text-decoration: none; border-radius: 8px;">
+          Return to Prolific →
+        </a>
+        <p class="text-muted text-small" style="margin-top: 8px;">
+          Clicking this button will mark your submission complete on Prolific automatically.
+          If it doesn't work, copy the completion code above and paste it into Prolific manually.
+        </p>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="alert alert-info" style="text-align: left;">
+        <strong>Next steps:</strong>
+        <ul style="margin-top: 8px; margin-bottom: 0;">
+          <li>
+            <strong>Prolific participants:</strong> Click the <em>Return to Prolific</em> button above —
+            it will auto-submit your completion code. As a fallback, you can also paste the code above
+            into Prolific manually.
+          </li>
+          <li style="margin-top: 6px;">
+            <strong>Non-Prolific participants:</strong> Email your completion code to
+            <a href="mailto:[contact email]">[contact email]</a>
+            to receive your compensation.
+          </li>
+        </ul>
+      </div>
+
+      <p class="text-muted text-small mt-16">
+        If you have any questions, please contact
+        <a href="mailto:[contact email]">[contact email]</a>.
+      </p>
+    </div>
+
+    <div class="study-card" style="margin-top: 20px;">
+      <h3 style="margin-top: 0;">Optional: Study Feedback</h3>
+      <p class="text-muted text-small">
+        Did you run into any bugs, confusing instructions, or other issues during the study?
+        Any feedback — positive or negative — is appreciated.
+      </p>
+      <textarea
+        id="feedback-textarea"
+        rows="5"
+        placeholder="Describe any bugs you encountered or share general feedback about the study..."
+        style="width: 100%; box-sizing: border-box; padding: 10px; font-family: inherit; font-size: 14px; border: 1px solid #d1d5db; border-radius: 6px; resize: vertical;"
+      ></textarea>
+      <div id="feedback-error" class="alert alert-error" style="display:none; margin-top: 8px;"></div>
+      <div id="feedback-success" class="alert alert-info" style="display:none; margin-top: 8px;">
+        Thanks! Your feedback has been recorded.
+      </div>
+      <div style="text-align: right; margin-top: 10px;">
+        <button class="btn-primary btn-sm" id="feedback-submit-btn" onclick="submitFeedback()">
+          Submit Feedback
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// Hydrate the completion code + Prolific URL. Prefer the URL params (set by
+// task.html when the participant first lands here). On a refresh, fall
+// back to /api/study/status which surfaces the same fields for completed
+// participants — that way the Prolific button doesn't disappear if they
+// refresh or revisit the page.
+const params = new URLSearchParams(window.location.search);
+let code = params.get('code') || '';
+let returnUrl = params.get('url') || '';
+
+(async function hydrate() {
+  if (!code || !returnUrl) {
+    try {
+      const res = await fetch('/api/study/status');
+      if (res.ok) {
+        const s = await res.json();
+        if (s.completed) {
+          code = code || s.completion_code || '';
+          returnUrl = returnUrl || s.completion_url || '';
+        }
+      }
+    } catch (_) { /* fall through to placeholder display */ }
+  }
+  document.getElementById('completion-code').textContent = code || '--------';
+  if (returnUrl) {
+    const link = document.getElementById('prolific-return-link');
+    link.href = returnUrl;
+    document.getElementById('prolific-return').style.display = '';
+  }
+})();
+
+function copyCode() {
+  if (!code) {
+    showToast('No completion code available.');
+    return;
+  }
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('Code copied to clipboard!');
+    document.getElementById('copy-hint').textContent = 'Copied!';
+    setTimeout(() => {
+      document.getElementById('copy-hint').textContent = 'Click the code to copy it to your clipboard.';
+    }, 3000);
+  }).catch(() => {
+    // Fallback: select the text
+    const el = document.getElementById('completion-code');
+    const range = document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    showToast('Please press Ctrl+C / Cmd+C to copy.');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+async function submitFeedback() {
+  const textarea = document.getElementById('feedback-textarea');
+  const errorEl = document.getElementById('feedback-error');
+  const successEl = document.getElementById('feedback-success');
+  const btn = document.getElementById('feedback-submit-btn');
+  const content = textarea.value.trim();
+
+  errorEl.style.display = 'none';
+  successEl.style.display = 'none';
+
+  if (!content) {
+    errorEl.textContent = 'Please enter some feedback before submitting.';
+    errorEl.style.display = '';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  try {
+    const res = await fetch('/api/study/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ content }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || 'Failed to submit feedback.');
+    }
+    successEl.style.display = '';
+    textarea.value = '';
+    btn.textContent = 'Submit More';
+  } catch (e) {
+    errorEl.textContent = e.message;
+    errorEl.style.display = '';
+    btn.textContent = 'Submit Feedback';
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

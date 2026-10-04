@@ -1,0 +1,10 @@
+# Dataset + judge/generation API client
+datasets>=2.14.0
+openai>=1.0.0
+tqdm>=4.65.0
+
+# local generation for the binary-checklist script.
+# Only needed when evaluating a local (non-API) model; API-only workflows do not require it.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.10.0+cu128
+vllm>=0.10.0

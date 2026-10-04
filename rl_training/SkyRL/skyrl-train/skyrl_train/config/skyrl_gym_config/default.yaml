@@ -1,0 +1,87 @@
+# @package environment.skyrl_gym
+# Modified from SkyRL (https://github.com/NovaSky-AI/SkyRL) for utility-of-user-simulators; see rl_training/SkyRL/README.md.
+# number of background workers for env step calls. Set to 0 to disable background workers.
+max_env_workers: 32
+
+# User-simulator environments (skyrl_gym/envs/user_simulator). Defaults follow Appendices C.4, D, and E.
+# Every `base_url` points to an OpenAI-compatible server (e.g. `vllm serve`), and every `model` must match
+# the name that server exposes. Judge fields omitted in an override fall back to temperature 0.0,
+# structured_output true, and max_retries 8. `judge_rubric` selects a rubric from
+# skyrl_gym/envs/user_simulator/judge_rubrics.py; `paper` is the Appendix E rubric.
+
+sftuser:
+  max_turns: 5
+  user_simulator:
+    model: "jjssuh/sftuser-base-Qwen2.5-14B-Instruct"
+    tokenizer: null  # defaults to `model`; must include the <|endconversation|> token
+    base_url: "http://localhost:8002/v1"
+    temperature: 0.7
+    top_p: 0.9
+    max_tokens: 1024
+    terminal_signal: "<|endconversation|>"
+    max_dedup_retries: 5  # resample a verbatim repeat of the previous user turn, +0.05 temperature per retry
+    max_retries: 8
+  judge_rubric: paper
+  llm_judges:
+    - model: "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
+      base_url: "http://localhost:8003/v1"
+      temperature: 0.0
+      structured_output: true
+      max_retries: 8
+    - model: "Qwen/Qwen3-32B"
+      base_url: "http://localhost:8004/v1"
+      temperature: 0.0
+      structured_output: true
+      max_retries: 8
+
+# RPUSER1 (generate_first_turn: true) and RPUSER2 (generate_first_turn: false).
+rpuser:
+  max_turns: 5
+  generate_first_turn: false
+  user_simulator:
+    model: "Qwen/Qwen2.5-14B-Instruct"
+    base_url: "http://localhost:8002/v1"
+    temperature: 0.7
+    top_p: 0.9
+    max_tokens: 1024
+    terminal_signal: "<|endconversation|>"
+    structured_output: true
+    max_retries: 8
+  judge_rubric: paper
+  llm_judges:
+    - model: "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
+      base_url: "http://localhost:8003/v1"
+      temperature: 0.0
+      structured_output: true
+      max_retries: 8
+    - model: "Qwen/Qwen3-32B"
+      base_url: "http://localhost:8004/v1"
+      temperature: 0.0
+      structured_output: true
+      max_retries: 8
+
+# RPUSER3: a persona guideline per conversation, drawn from `extra_info.persona_seed`.
+rpuser_persona:
+  max_turns: 5
+  generate_first_turn: false
+  user_simulator:
+    model: "Qwen/Qwen2.5-14B-Instruct"
+    base_url: "http://localhost:8002/v1"
+    temperature: 0.7
+    top_p: 0.9
+    max_tokens: 1024
+    terminal_signal: "<|endconversation|>"
+    structured_output: true
+    max_retries: 8
+  judge_rubric: paper
+  llm_judges:
+    - model: "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
+      base_url: "http://localhost:8003/v1"
+      temperature: 0.0
+      structured_output: true
+      max_retries: 8
+    - model: "Qwen/Qwen3-32B"
+      base_url: "http://localhost:8004/v1"
+      temperature: 0.0
+      structured_output: true
+      max_retries: 8

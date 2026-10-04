@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing Setup — UC Berkeley</title>
+<link rel="stylesheet" href="/study.css">
+<style>
+.setup-wrap { max-width: 960px; margin: 0 auto; padding: 24px 20px; }
+.step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.step-num { background: var(--berkeley-blue); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+.step-title { font-size: 18px; font-weight: 700; color: var(--berkeley-blue); }
+.doc-type-badge { display: inline-block; background: var(--california-gold); color: var(--berkeley-blue); padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 13px; letter-spacing: 0.3px; }
+.hint-muted { color: #64748b; font-size: 13px; margin: 4px 0 14px; }
+
+.intent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+@media (max-width: 700px) { .intent-grid { grid-template-columns: 1fr; } }
+.intent-list { max-height: 520px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
+.intent-item { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background 0.12s; }
+.intent-item:last-child { border-bottom: none; }
+.intent-item:hover { background: #f8fafc; }
+.intent-item.selected { background: #e0f2fe; border-left: 3px solid var(--berkeley-blue); }
+.intent-title { font-weight: 700; color: var(--berkeley-blue); font-size: 14px; }
+.intent-brief { font-size: 13px; color: #475569; margin-top: 4px; line-height: 1.4; }
+
+.intent-preview { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+.intent-preview.empty { color: #94a3b8; font-style: italic; }
+.intent-preview h4 { margin-bottom: 6px; color: var(--berkeley-blue); font-size: 15px; }
+.intent-preview p { font-size: 14px; color: #334155; line-height: 1.5; }
+
+.prewriting-block { margin-top: 20px; }
+.prewriting-q { margin-bottom: 16px; }
+.prewriting-q label { display: block; font-weight: 600; font-size: 14px; color: #334155; margin-bottom: 6px; }
+.prewriting-q textarea { width: 100%; min-height: 80px; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 13.5px; line-height: 1.5; font-family: inherit; resize: vertical; background: #fff; box-sizing: border-box; }
+.prewriting-q textarea:focus { outline: none; border-color: var(--berkeley-blue); }
+
+.step.hidden { display: none; }
+.step-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
+
+.btn-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+</style>
+</head>
+<body class="study-page">
+
+<header class="study-header">
+  <span class="header-logo">UC Berkeley</span>
+  <span class="header-title">Creating Writing Contents with AI Assistants</span>
+  <span class="header-badge">Setup</span>
+</header>
+
+<div class="setup-wrap">
+
+  <div class="step-section">
+    <h2 style="margin-bottom: 6px;">Writing Task Setup</h2>
+    <div id="assignment-box">
+      <p>You have been assigned the document type:</p>
+      <p style="margin-top: 8px;"><span class="doc-type-badge" id="doc-type-badge">…</span></p>
+      <p class="hint-muted" id="doc-type-description" style="margin-top: 8px;"></p>
+    </div>
+  </div>
+
+  <div class="step-section step" id="step1">
+    <div class="step-header">
+      <span class="step-num">1</span>
+      <span class="step-title">Choose an intent</span>
+    </div>
+    <p class="hint-muted">Browse the list and pick the intent you are most interested in writing about.</p>
+    <div class="intent-grid">
+      <div class="intent-list" id="intent-list"></div>
+      <div class="intent-preview empty" id="intent-preview">Select an intent on the left to see its full brief here.</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" id="to-step2-btn" disabled onclick="goToStep2()">Proceed to Step 2: Pre-Writing →</button>
+    </div>
+  </div>
+
+  <div class="step-section step hidden" id="step2">
+    <div class="step-header">
+      <span class="step-num">2</span>
+      <span class="step-title">Pre-writing: jot down some thoughts</span>
+    </div>
+    <div id="selected-intent-preview" class="intent-preview" style="margin-bottom: 16px;"></div>
+    <p class="hint-muted">
+      Before talking with the AIs, briefly jot down your thoughts on these questions.
+      <strong>These notes are for your own reference during Step 3 — they are not shared with the AIs.</strong>
+      The AIs will only know what you tell them in chat; please do <em>not</em> paste all your notes
+      into the AIs at once when you start chatting.
+    </p>
+    <div id="prewriting-form" class="prewriting-block"></div>
+    <div id="setup-error" class="alert alert-error" style="display:none; margin-top: 8px;"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="backToStep1()">← Back to Step 1</button>
+      <button class="btn-primary" id="submit-setup-btn" onclick="submitSetup()">Submit &amp; Begin Step 3 →</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const MIN_PREWRITING_WORDS = 20;
+
+function wordCount(s) {
+  return (s || '').trim().split(/\s+/).filter(Boolean).length;
+}
+
+const state = {
+  docType: null,
+  docTypeLabel: null,
+  intents: [],
+  selectedIntentId: null,
+  selectedIntent: null,
+  prewritingQuestions: [],
+};
+
+(async function init() {
+  try {
+    const s = await fetch('/api/study/status').then(r => r.json());
+    if (!s.has_session || !s.consent_given) { window.location.href = '/study'; return; }
+    if (s.completed) { window.location.href = '/study/done'; return; }
+    if (s.setup_ready) {
+      window.location.href = '/study/task';
+      return;
+    }
+
+    const res = await fetch('/api/study/setup/assign', { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Failed to assign writing setup');
+
+    state.docType = data.doc_type;
+    state.docTypeLabel = data.doc_type_label;
+    state.docTypeDescription = data.doc_type_description || '';
+    state.intents = data.intents || [];
+    state.prewritingQuestions = data.prewriting_questions || [];
+
+    document.getElementById('doc-type-badge').textContent = state.docTypeLabel;
+    document.getElementById('doc-type-description').textContent = state.docTypeDescription;
+    renderIntentList();
+  } catch (e) {
+    showError(e.message);
+  }
+})();
+
+function renderIntentList() {
+  const list = document.getElementById('intent-list');
+  list.innerHTML = '';
+  for (const intent of state.intents) {
+    const item = document.createElement('div');
+    item.className = 'intent-item';
+    item.dataset.id = intent.id;
+    item.innerHTML = `
+      <div class="intent-title">${escapeHtml(intent.title)}</div>
+      <div class="intent-brief">${escapeHtml(intent.brief)}</div>
+    `;
+    item.onclick = () => selectIntent(intent.id);
+    list.appendChild(item);
+  }
+}
+
+function selectIntent(intentId) {
+  state.selectedIntentId = intentId;
+  state.selectedIntent = state.intents.find(i => i.id === intentId);
+
+  document.querySelectorAll('.intent-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.id === intentId);
+  });
+
+  const preview = document.getElementById('intent-preview');
+  preview.classList.remove('empty');
+  preview.innerHTML = `
+    <h4>${escapeHtml(state.selectedIntent.title)}</h4>
+    <p>${escapeHtml(state.selectedIntent.brief)}</p>
+  `;
+
+  document.getElementById('to-step2-btn').disabled = false;
+}
+
+async function goToStep2() {
+  if (!state.selectedIntentId) return;
+  const btn = document.getElementById('to-step2-btn');
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/study/setup/intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ intent_id: state.selectedIntentId }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Failed to record intent');
+
+    document.getElementById('step1').classList.add('hidden');
+    document.getElementById('step2').classList.remove('hidden');
+    renderPrewriting();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) {
+    showError(e.message);
+    btn.disabled = false;
+  }
+}
+
+function backToStep1() {
+  document.getElementById('step2').classList.add('hidden');
+  document.getElementById('step1').classList.remove('hidden');
+  document.getElementById('to-step2-btn').disabled = !state.selectedIntentId;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderPrewriting() {
+  const preview = document.getElementById('selected-intent-preview');
+  preview.innerHTML = `
+    <h4>${escapeHtml(state.selectedIntent.title)}</h4>
+    <p>${escapeHtml(state.selectedIntent.brief)}</p>
+  `;
+  preview.classList.remove('empty');
+
+  const form = document.getElementById('prewriting-form');
+  form.innerHTML = '';
+  state.prewritingQuestions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'prewriting-q';
+    div.innerHTML = `
+      <label for="pw-${i}">${escapeHtml(q)}</label>
+      <textarea id="pw-${i}" placeholder="Jot down your thoughts (minimum ${MIN_PREWRITING_WORDS} words)…"></textarea>
+    `;
+    form.appendChild(div);
+  });
+}
+
+async function submitSetup() {
+  const btn = document.getElementById('submit-setup-btn');
+  document.getElementById('setup-error').style.display = 'none';
+
+  const answers = state.prewritingQuestions.map((_, i) => {
+    const el = document.getElementById(`pw-${i}`);
+    return el ? el.value.trim() : '';
+  });
+  if (answers.some(a => !a)) {
+    showError('Please answer each pre-writing question — even one sentence is fine. (These notes stay visible to you during the chat; the AIs will not see them directly.)');
+    return;
+  }
+  const tooShort = answers
+    .map((a, i) => ({ idx: i + 1, words: wordCount(a) }))
+    .filter(x => x.words < MIN_PREWRITING_WORDS);
+  if (tooShort.length > 0) {
+    const detail = tooShort.map(x => `Question ${x.idx} (${x.words} words)`).join(', ');
+    showError(`Each pre-writing answer must be at least ${MIN_PREWRITING_WORDS} words. Please expand: ${detail}.`);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner light"></span>Submitting…';
+  try {
+    const res = await fetch('/api/study/setup/prewriting', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Failed to submit pre-writing');
+
+    window.location.href = '/study/task';
+  } catch (e) {
+    showError(e.message);
+    btn.disabled = false;
+    btn.textContent = 'Submit & Begin Step 3 →';
+  }
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function showError(msg) {
+  const el = document.getElementById('setup-error');
+  el.textContent = msg;
+  el.style.display = '';
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

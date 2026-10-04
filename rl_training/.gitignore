@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+
+# Data, checkpoints, and run outputs
+*.parquet
+*.jsonl
+ckpts/
+exports/
+outputs/
+wandb/
+*.log
+
+# Secrets
+.env
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
